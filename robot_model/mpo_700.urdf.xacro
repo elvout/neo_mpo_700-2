@@ -193,6 +193,10 @@ Contributor: Adarsh Karan K P
           />
       </xacro:if>
 
+      <xacro:if value="${gripper == 'vg10'}">
+        <xacro:include filename="$(find ros2_vg10_gripper)/urdf/vg10.xacro" />
+      </xacro:if>
+
     </xacro:unless>
 
   </xacro:unless>

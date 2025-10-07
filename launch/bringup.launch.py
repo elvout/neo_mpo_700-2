@@ -255,6 +255,20 @@ def execution_stage(context: LaunchContext,
 
                 launch_actions.append(gripper_epick)
 
+            # For OnRobot VG10
+            elif gripper_typ == "vg10":
+                ros2_vg10_gripper = IncludeLaunchDescription(
+                    PythonLaunchDescriptionSource(
+                        os.path.join(
+                            get_package_share_directory("ros2_vg10_gripper"),
+                            "launch",
+                            "vg10_node.launch.py"
+                        )
+                    )
+                )
+
+                launch_actions.append(ros2_vg10_gripper)
+
     # Relaying lidar data to /scan topic
     relay_topic_lidar1 = Node(
             package='topic_tools',
@@ -339,7 +353,7 @@ def generate_launch_description():
 
     declare_robotiq_cmd = DeclareLaunchArgument(
             'gripper_type', default_value='',
-            choices=['', '2f_140', '2f_85', 'epick'],
+            choices=['', '2f_140', '2f_85', 'epick', 'vg10'],
             description="Enables gripper and it's controllers"
         )
 
