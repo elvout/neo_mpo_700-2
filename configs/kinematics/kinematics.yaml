@@ -7,7 +7,7 @@
     zero_vel_threshold: 0.001
     small_vel_threshold: 0.02
     steer_hysteresis: 30.0
-    broadcast_tf: true
+    broadcast_tf: false
     cmd_timeout: 0.2
 
     drive0:
