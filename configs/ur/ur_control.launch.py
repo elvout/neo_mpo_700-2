@@ -165,6 +165,7 @@ def launch_setup(context):
         "forward_velocity_controller",
         "forward_position_controller",
         "freedrive_mode_controller",
+        "admittance_controller",
     ]
     if activate_joint_controller.perform(context) == "true":
         controllers_active.append(initial_joint_controller.perform(context))
