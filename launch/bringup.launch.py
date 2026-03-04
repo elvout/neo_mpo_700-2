@@ -99,17 +99,20 @@ def execution_stage(context: LaunchContext,
 
     #  Launch hardware nodes
     # 1. Relayboard
-    relayboard = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(neo_mpo_700, 'configs/relayboard_v2', 'relayboard_v2.launch.py')
-            ),
-            launch_arguments={
-                'namespace': robot_namespace
-            }.items(),
-            condition=UnlessCondition(mock_arm)
-        )
+    # Relayboard is started at boot by neo-relayboard.service, so bringup does not launch it here.
+    # This avoids duplicate relayboard nodes when the service is active.
+    # NOTE: the systemd service currently launches relayboard in the root namespace (no robot_namespace).
+    # relayboard = IncludeLaunchDescription(
+    #         PythonLaunchDescriptionSource(
+    #             os.path.join(neo_mpo_700, 'configs/relayboard_v2', 'relayboard_v2.launch.py')
+    #         ),
+    #         launch_arguments={
+    #             'namespace': robot_namespace
+    #         }.items(),
+    #         condition=UnlessCondition(mock_arm)
+    #     )
 
-    launch_actions.append(relayboard)
+    # launch_actions.append(relayboard)
 
     # 2. Kinematics
     kinematics = IncludeLaunchDescription(

@@ -26,6 +26,8 @@
         #            4 = POWER_SUPPLY_TECHNOLOGY_LIFE
         #            5 = POWER_SUPPLY_TECHNOLOGY_NICD
         #            6 = POWER_SUPPLY_TECHNOLOGY_LIMN
+        #            7 = POWER_SUPPLY_TECHNOLOGY_TERNARY
+        #            8 = POWER_SUPPLY_TECHNOLOGY_VRLA
 
         # design_capacity: [Ah]
 
@@ -33,7 +35,7 @@
           serial_number: neobattery1
           location: slot1
           design_capacity: 100.0
-          chemistry: 1
+          chemistry: 8
 
 
         #################################################

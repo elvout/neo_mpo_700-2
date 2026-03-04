@@ -1,0 +1,32 @@
+[Unit]
+Description=Neo Relayboard ROS2 Node
+Wants=dev-neo-relayboard.device
+After=dev-neo-relayboard.device
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=neobotix
+Group=neobotix
+WorkingDirectory=/home/neobotix/neo_mmo_700_ws
+Environment=WS_DIR=/home/neobotix/neo_mmo_700_ws
+Environment=ROS2ENV=/home/neobotix/dotfiles/ros2env.sh
+Environment="RMW_IMPLEMENTATION=rmw_cyclonedds_cpp"
+Environment="CYCLONEDDS_URI=file:///home/neobotix/.cyclonedds.xml"
+
+ExecStartPre=/usr/bin/bash -lc 'set -euo pipefail; test -f "$ROS2ENV"; test -f "$WS_DIR/install/setup.bash"; test -c /dev/neo-relayboard'
+ExecStart=/usr/bin/bash -lc '\
+  set -eo pipefail; \
+  source "$ROS2ENV"; \
+  source "$WS_DIR/install/setup.bash"; \
+  ros2 launch neo_mpo_700-2 relayboard_v2.launch.py \
+'
+
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
