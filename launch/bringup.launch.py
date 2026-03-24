@@ -86,7 +86,8 @@ def execution_stage(context: LaunchContext,
         namespace=robot_namespace,
         parameters=[{
             'robot_description': ParameterValue(Command(xacro_args), value_type=str),
-            'frame_prefix': rp_ns
+            'frame_prefix': rp_ns,
+            'publish_frequency': 120.0,
         }],
         remappings=[
             ('/tf', 'tf'),
