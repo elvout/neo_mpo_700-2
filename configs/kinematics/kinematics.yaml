@@ -6,7 +6,7 @@
     wheel_lever_arm: 0.045
     zero_vel_threshold: 0.001
     small_vel_threshold: 0.02
-    steer_hysteresis: 30.0
+    steer_hysteresis: 91.0  # effectively disabled at >= 90deg
     broadcast_tf: false
     cmd_timeout: 0.2
 
