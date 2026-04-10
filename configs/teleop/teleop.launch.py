@@ -28,23 +28,28 @@ def generate_launch_description():
             mappings={
                 "prefix": "ur10e",
                 "gripper_type": "vg10",
+                "disable_scanners": "true",
             },
         )
-        # TODO(elvout): For some reason this is unable to parse the urdf.
-        # moveit will obtain the urdf from /robot_description with a warning.
-        # .robot_description(
-        #     file_path=urdf_path,
-        #     mappings={
-        #         "arm_type": "ur10e",
-        #         "disable_scanners": True,
-        #         "gripper_type": "vg10",
-        #         "use_ur_dc": True,
-        #         "use_gz": False,
-        #         "force_abs_paths": False,
-        #         "use_mock_hardware": False,
-        #         "mock_sensor_commands": False,
-        #     },
-        # )
+        .robot_description(
+            file_path=os.path.join(
+                get_package_share_directory("neo_mpo_700-2"),
+                "robot_model",
+                "mpo_700.urdf.xacro",
+            ),
+            mappings={
+                "arm_type": "ur10e",
+                "disable_scanners": "true",
+                "use_imu": "false",
+                "use_d435": "false",
+                "use_ur_dc": "true",
+                "use_gz": "false",
+                "force_abs_paths": "false",
+                "use_mock_hardware": "false",
+                "mock_sensor_commands": "false",
+                "gripper_type": "vg10",
+            },
+        )
         .to_moveit_configs()
     )
 
@@ -68,6 +73,7 @@ def generate_launch_description():
                 # name="ur_teleop_node",
                 parameters=[
                     ur_teleop_config,
+                    moveit_config.robot_description,
                     moveit_config.robot_description_semantic,
                     moveit_config.robot_description_kinematics,
                 ],
