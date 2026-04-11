@@ -37,6 +37,7 @@ def execution_stage(context: LaunchContext,
                     controllers_yaml):
 
     neo_mpo_700 = get_package_share_directory('neo_mpo_700-2')
+    neo_ur_moveit_config = get_package_share_directory('neo_ur_moveit_config')
 
     imu_enabl = str(imu_enable.perform(context))
     d435_enabl = str(d435_enable.perform(context))
@@ -218,6 +219,26 @@ def execution_stage(context: LaunchContext,
             )
 
         launch_actions.append(ur_arm)
+
+        ur_moveit = IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        neo_ur_moveit_config,
+                        'launch',
+                        'neo_ur_moveit.launch.py')
+                ),
+                launch_arguments={
+                    'robot_type': 'mpo_700',
+                    'arm_type': arm_typ,
+                    'prefix': arm_typ,
+                    'use_ur_dc': use_ur_dc,
+                    'gripper_type': gripper_typ,
+                    'launch_rviz': 'False',
+                }.items(),
+                condition=UnlessCondition(mock_arm)
+            )
+
+        launch_actions.append(ur_moveit)
 
         # Conditionally add grippers
         if gripper_typ != "":
