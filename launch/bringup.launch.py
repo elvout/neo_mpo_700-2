@@ -34,7 +34,9 @@ def execution_stage(context: LaunchContext,
                     mock_arm,
                     initial_controller_arm,
                     robot_ip,
-                    controllers_yaml):
+                    reverse_ip,
+                    controllers_yaml,
+                    direct_ur_connection):
 
     neo_mpo_700 = get_package_share_directory('neo_mpo_700-2')
     neo_ur_moveit_config = get_package_share_directory('neo_ur_moveit_config')
@@ -49,6 +51,7 @@ def execution_stage(context: LaunchContext,
     use_mock = str(mock_arm.perform(context))
     initial_controller_arm_name = str(initial_controller_arm.perform(context))
     disable_scanner = str(disable_scanners.perform(context))
+    has_direct_ur_connection = str(direct_ur_connection.perform(context))
 
     launch_actions = []
 
@@ -66,6 +69,7 @@ def execution_stage(context: LaunchContext,
         " ", 'arm_type:=', arm_typ,
         " ", 'use_ur_dc:=', use_ur_dc,
         " ", 'robot_ip:=', robot_ip,
+        " ", 'reverse_ip:=', reverse_ip,
         " ", 'gripper_type:=', gripper_typ,
         " ", 'use_mock_hardware:=', use_mock,
         " ", 'use_mock_sensor_commands:=', use_mock,
@@ -192,11 +196,7 @@ def execution_stage(context: LaunchContext,
     # 7. Arm - Bringing up drivers for Universal Arm
     # TODO: Add support for Elite Robots
     # TODO: Add support for namespacing
-    if (arm_typ == "ur5" or
-        arm_typ == "ur10" or
-        arm_typ == "ur5e" or
-        arm_typ == "ur10e"):
-
+    if arm_typ in {"ur5", "ur10", "ur5e", "ur10e"} and has_direct_ur_connection.lower() == 'true':
         # Mock hardware supports only `joint_trajectory_controller`
         if use_mock.lower() == 'true':
             initial_controller_arm_name = "joint_trajectory_controller"
@@ -210,6 +210,7 @@ def execution_stage(context: LaunchContext,
                 launch_arguments={
                     'ur_type': arm_typ,
                     'robot_ip': robot_ip,
+                    'reverse_ip': reverse_ip,
                     'tf_prefix': arm_typ,
                     'use_mock_hardware': mock_arm,
                     'mock_sensor_commands': mock_arm,
@@ -397,6 +398,14 @@ def generate_launch_description():
             'robot_ip', default_value='192.168.1.102',
             description='IP address of the robot arm.'
         )
+    declare_reverse_ip_cmd = DeclareLaunchArgument(
+            'reverse_ip', default_value='192.168.1.10',
+            description='IP address on this machine used by UR to connect to the reverse interface.'
+        )
+    declare_direct_ur_connection_cmd = DeclareLaunchArgument(
+            'direct_ur_connection', default_value='False',
+            description='Only launch UR driver, MoveIt, and gripper bringup when UR is directly connected to this machine.'
+        )
 
     declare_controllers_file_cmd = DeclareLaunchArgument(
             'controllers_file',
@@ -422,7 +431,9 @@ def generate_launch_description():
             LaunchConfiguration('use_mock_arm'),
             LaunchConfiguration('initial_controller_arm'),
             LaunchConfiguration('robot_ip'),
-            LaunchConfiguration('controllers_file')
+            LaunchConfiguration('reverse_ip'),
+            LaunchConfiguration('controllers_file'),
+            LaunchConfiguration('direct_ur_connection')
             ])
 
     ld = LaunchDescription([
@@ -438,6 +449,8 @@ def generate_launch_description():
         declare_mock_arm_cmd,
         declare_initial_controller_arm_cmd,
         declare_robot_ip_cmd,
+        declare_reverse_ip_cmd,
+        declare_direct_ur_connection_cmd,
         declare_controllers_file_cmd,
         opq_function
     ])
