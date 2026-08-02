@@ -15,11 +15,12 @@ from launch.actions import (
   OpaqueFunction
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, Command, PythonExpression
+from launch.substitutions import LaunchConfiguration, Command, PythonExpression, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.descriptions import ParameterValue
 from launch.launch_context import LaunchContext
 from launch.conditions import UnlessCondition
+from launch_ros.substitutions import FindPackageShare
 
 def execution_stage(context: LaunchContext,
                     robot_namespace,
@@ -30,6 +31,7 @@ def execution_stage(context: LaunchContext,
                     docking_adapter,
                     arm_type,
                     ur_dc,
+                    ur_calibration_file,
                     gripper_type,
                     mock_arm,
                     initial_controller_arm,
@@ -68,6 +70,7 @@ def execution_stage(context: LaunchContext,
         "xacro", " ", urdf,
         " ", 'arm_type:=', arm_typ,
         " ", 'use_ur_dc:=', use_ur_dc,
+        " ", 'ur_calibration_file:=', ur_calibration_file,
         " ", 'robot_ip:=', robot_ip,
         " ", 'reverse_ip:=', reverse_ip,
         " ", 'gripper_type:=', gripper_typ,
@@ -233,6 +236,7 @@ def execution_stage(context: LaunchContext,
                     'arm_type': arm_typ,
                     'prefix': arm_typ,
                     'use_ur_dc': use_ur_dc,
+                    'ur_calibration_file': ur_calibration_file,
                     'gripper_type': gripper_typ,
                     'launch_rviz': 'False',
                 }.items(),
@@ -377,6 +381,19 @@ def generate_launch_description():
             description='Set this argument to True if you have an UR arm with DC variant'
         )
 
+    declare_ur_calibration_file_cmd = DeclareLaunchArgument(
+        "ur_calibration_file",
+        default_value=PathJoinSubstitution(
+            [
+                FindPackageShare("ur_description"),
+                "config",
+                LaunchConfiguration("arm_type"),
+                "default_kinematics.yaml",
+            ]
+        ),
+        description="UR calibration configuration file.",
+    )
+
     declare_robotiq_cmd = DeclareLaunchArgument(
             'gripper_type', default_value='',
             choices=['', '2f_140', '2f_85', 'epick', 'vg10'],
@@ -427,6 +444,7 @@ def generate_launch_description():
             LaunchConfiguration('use_docking_adapter'),
             LaunchConfiguration('arm_type'),
             LaunchConfiguration('use_ur_dc'),
+            LaunchConfiguration('ur_calibration_file'),
             LaunchConfiguration('gripper_type'),
             LaunchConfiguration('use_mock_arm'),
             LaunchConfiguration('initial_controller_arm'),
@@ -445,6 +463,7 @@ def generate_launch_description():
         declare_use_docking_adapter_cmd,
         declare_arm_type_cmd,
         declare_ur_pwr_variant_cmd,
+        declare_ur_calibration_file_cmd,
         declare_robotiq_cmd,
         declare_mock_arm_cmd,
         declare_initial_controller_arm_cmd,

@@ -19,6 +19,14 @@ Contributor: Adarsh Karan K P
   <xacro:arg name="arm_parent" default="cabinet_link"/>
   <xacro:arg name="gripper_type" default=""/>
   <xacro:arg name="use_ur_dc" default="false"/>
+  <!--
+    Downstream UR xacros call this calibration file argument
+    "kinematics_params". We use a more specific user-facing name since
+    "kinematics_params" may be ambiguous in launch scripts. Nevertheless, it
+    needs to be aliased before importing the UR xacros.
+  -->
+  <xacro:arg name="ur_calibration_file"
+    default="$(find ur_description)/config/$(arg arm_type)/default_kinematics.yaml"/>
   <xacro:arg name="force_abs_paths" default="false"/>
   <xacro:arg name="simulation_controllers" default=""/>
   <xacro:arg name="use_mock_hardware" default="false"/>
@@ -148,6 +156,7 @@ Contributor: Adarsh Karan K P
       </xacro:if>
 
       <!-- Include the UR arm -->
+      <xacro:arg name="kinematics_params" default="$(arg ur_calibration_file)" />
       <xacro:include filename="$(find mp_components)/urdf/arm/ur_arm.urdf.xacro"/>
     </xacro:if>
 
